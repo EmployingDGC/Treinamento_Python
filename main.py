@@ -1,12 +1,12 @@
-from pandas import read_csv, to_datetime, DataFrame
+import pandas
 
 
 if __name__ == '__main__':
     filename = "./Datasets/Imóveis.csv"
 
-    data = read_csv(filename, sep=",").to_dict()
+    data = pandas.read_csv(filename, sep=",").to_dict()
 
-    frame = DataFrame(data)
+    frame = pandas.read_csv(filename, sep=",")
 
     print(f"\n{frame.shape}")
 
@@ -16,21 +16,19 @@ if __name__ == '__main__':
 
     print(f"\n{frame.dtypes}")
 
-    frame["data"] = to_datetime(frame["data"])
+    frame["data"] = pandas.to_datetime(frame["data"])
 
     frame["análise"] = 2021
 
-    print(f"\n{DataFrame(data, columns=['id', 'data', 'preço', 'quartos', 'banheiros', 'ano de construção'])}")
+    print(f"\n{pandas.DataFrame(data, columns=['id', 'data', 'preço', 'quartos', 'banheiros', 'ano de construção'])}")
 
-    del frame["metragem da casa.1"]
+    frame.drop(["metragem da casa.1"], axis=1)  # axis começa em 0, main axis = linha
 
-    frame["banheiros"] = frame["banheiros"].apply(lambda num: str(num).split(",")[0])
-
-    frame["banheiros"] = frame["banheiros"].astype('int64')
+    frame["banheiros"] = frame["banheiros"].apply(lambda num: str(num).split(",")[0]).astype('int64')
 
     print(f"\n{frame.loc[frame['ano de construção'] < 2000]}")
 
-    frame.rename(columns={
+    frame = frame.rename(columns={
         "data": "DT_REFERENCIA",
         "preço": "VL_PRECO",
         "quartos": "QTD_QUARTOS",
@@ -42,7 +40,7 @@ if __name__ == '__main__':
         "andares": "QTD_ANDARES",
         "orla": "FL_ORLA",
         "vista": "FL_VISTA"
-    }, inplace=True)
+    })
 
     print(f"\n{frame.dtypes}")
 
@@ -50,9 +48,7 @@ if __name__ == '__main__':
 
     print(f"\n{frame['DS_TIPO_CONDICAO']}")
 
-    frame["VL_PRECO"] = frame["VL_PRECO"].apply(lambda num: str(num).split(",")[0])
-
-    frame["VL_PRECO"] = frame["VL_PRECO"].astype('float64')
+    frame["VL_PRECO"] = frame["VL_PRECO"].apply(lambda num: str(num).replace(",", ".")).astype('float64')
 
     print(f"\n{frame[['id', 'VL_PRECO']].sort_values(['VL_PRECO'])}")
 
@@ -76,8 +72,16 @@ if __name__ == '__main__':
 
     print(f"\n{frame_filtro_3}")
 
+    preco_max = frame['VL_PRECO'].max()
+
     frame_casa_maior_preco = frame[frame['VL_PRECO'] == preco_max]
 
     print(f"\n{frame_casa_maior_preco['id']}")
+
+    preco_min = frame['VL_PRECO'].min()
+
+    frame_casa_menor_preco = frame[frame['VL_PRECO'] == preco_min]
+
+    print(f"\n{frame_casa_menor_preco['id']}")
 
     print(f"\n{frame['DT_REFERENCIA'].min()}")

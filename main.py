@@ -80,6 +80,8 @@ if __name__ == '__main__':
 
     print(f"\n{frame['DT_REFERENCIA'].min()}")
 
+    # exercícios parte 2
+
     print(f"\n{frame.groupby(['DS_TIPO_CONDICAO']).size().reset_index(name='QTD_IMOVEIS')}")
 
     print(f"\n{frame.groupby(['DT_ANO_CONSTRUCAO'])['VL_PRECO'].mean().reset_index(name='VL_MEDIA')}")

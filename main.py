@@ -4,8 +4,6 @@ import pandas
 if __name__ == '__main__':
     filename = "./Datasets/Imóveis.csv"
 
-    data = pandas.read_csv(filename, sep=",").to_dict()
-
     frame = pandas.read_csv(filename, sep=",")
 
     print(f"\n{frame.shape}")
@@ -20,7 +18,7 @@ if __name__ == '__main__':
 
     frame["análise"] = 2021
 
-    print(f"\n{pandas.DataFrame(data, columns=['id', 'data', 'preço', 'quartos', 'banheiros', 'ano de construção'])}")
+    print(f"\n{pandas.DataFrame(frame, columns=['id', 'data', 'preço', 'quartos', 'banheiros', 'ano de construção'])}")
 
     frame.drop(["metragem da casa.1"], axis=1)  # axis começa em 0, main axis = linha
 
@@ -64,11 +62,7 @@ if __name__ == '__main__':
 
     print(f"\n{preco_max}")
 
-    frame_filtro_3 = frame[frame["DS_TIPO_CONDICAO"] == "Bom"]  # Boa não existe
-
-    frame_filtro_3 = frame_filtro_3[frame_filtro_3["QTD_QUARTOS"] > 2]
-
-    frame_filtro_3 = frame_filtro_3[frame_filtro_3["QTD_BANHEIROS"] > 2]
+    frame_filtro_3 = frame.query("DS_TIPO_CONDICAO == 'Bom' and QTD_QUARTOS > 2 and QTD_BANHEIROS > 2")
 
     print(f"\n{frame_filtro_3}")
 
@@ -85,3 +79,30 @@ if __name__ == '__main__':
     print(f"\n{frame_casa_menor_preco['id']}")
 
     print(f"\n{frame['DT_REFERENCIA'].min()}")
+
+    print(f"\n{frame.groupby(['DS_TIPO_CONDICAO']).size().reset_index(name='QTD_IMOVEIS')}")
+
+    print(f"\n{frame.groupby(['DT_ANO_CONSTRUCAO'])['VL_PRECO'].mean().reset_index(name='VL_MEDIA')}")
+
+    print(f"\n{frame.groupby(['DT_ANO_CONSTRUCAO'])['QTD_QUARTOS'].min().reset_index(name='NU_MENOR_QUARTOS')}")
+
+    print(f"\n{frame.groupby(['QTD_QUARTOS', 'QTD_BANHEIROS'])['VL_PRECO'].sum().reset_index(name='VL_SOMATORIO')}")
+
+    print(f"\n{frame.groupby(['DT_ANO_CONSTRUCAO'])['VL_PRECO'].median().reset_index(name='VL_MEDIANA')}")
+
+    frame["NU_CLASSIFICACAO_PRECO_1"] = [0 if num < 321950 else 1 if num <= 450000 else 2 if num <= 645000 else 3 for num in frame["VL_PRECO"]]
+
+    print(f"\n{frame.head()}")
+
+    frame["NU_CLASSIFICACAO_PRECO_2"] = frame["VL_PRECO"].apply(lambda num: 0 if num < 321950 else 1 if num <= 450000 else 2 if num <= 645000 else 3)
+
+    print(f"\n{frame.head()}")
+
+    media_preco = pandas.DataFrame({
+        "id": [x for x, y in enumerate(frame.groupby(["NU_CEP"]))],
+        "VL_MEDIA_PRECO": frame.groupby(["NU_CEP"])["VL_PRECO"].mean()
+    }).reset_index()
+
+    print(f"{media_preco}")
+
+    media_preco.to_csv("./Datasets/Imóveis2.csv", index=False)

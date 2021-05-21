@@ -387,4 +387,18 @@ if __name__ == '__main__':
         ascending=False
     )[:3]
 
+    tres_mais_compraram = pandas.DataFrame(
+        tres_mais_compraram,
+        columns=[
+            "ID",
+            "Nome_A",
+            "Nome_B",
+            "Valor"
+        ]
+    ).reset_index().drop(
+        "index",
+        axis=1
+    )
+
     print(f"\n{tres_mais_compraram}")
+
